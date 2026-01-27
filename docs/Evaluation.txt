@@ -1,0 +1,34 @@
+Lineamientos Técnicos Evaluación Personal Fabrica Desarrollo – v2026.01.23.:
+
+Implementar una solución para el “Ingreso y gestión de facturas” según lo detallado a continuación:
+
+ Para este diseño se requiere:
+
+Se debe permitir la creación de facturas y maestros de productos, clientes y usuarios (vendedores).
+Estos usuarios pueden ingresar facturas que contenga: Identificación del cliente, Nombre Cliente, Teléfono, correo, vendedor, fecha, múltiples formas de pago y detalles de la Factura (Producto, Cantidad, Precio Unitario, Precio total).
+El sistema debe permitir la consulta y visualización de las facturas ingresadas.
+El sistema debe ofrecer funcionalidades para filtrar y buscar facturas por criterios como número de factura, fecha y monto.
+Tomar como ejemplo el siguiente demo:
+
+URL: https://obedalvarado.com/demos/simple_invoice/
+Usuario: admin
+Contraseña: admin
+ La tecnología para utilizar son las siguientes:
+
+Frontend: Frontend Angular v16 o superior (Web SPA)
+Backend: C#.Net 6 o superior (API Rest)
+Bases de datos:  Puede ser alguna InMemory, SQLite o una base full creada en SQL Server Express/Community y nos incluyen el/los archivo(s) de datos (mdf/ldf/etc); es necesario incluir un documento pdf que ilustre el modelo entidad relación detallado utilizado en la propuesta de solución.
+Git: La solución debe ser publicada en un repositorio Git y confirmar los cambios de manera constante para validar el avance progresivo, no se tomara en cuenta repositorios que contengan un único commit.
+ Se evaluará:
+
+·         Diseño de la solución, debe contener al menos dos soluciones, una para Front y una para Back.
+·         Estructura del código.
+·         Arquitectura de implementación.
+·         Lógica del desarrollo.
+·         Funcionalidad del sistema.
+·         Buenas prácticas de desarrollo implementadas.
+·         Opcional (sería un plus): publicar el compilado para poder realizar browse desde una url pública.
+
+La solución a la prueba debe enviarse por correo hasta el Jueves 2026-01-29 y el entregable debe ser un enlace hacia un repositorio público de GitHub que contenga todos los archivos fuentes y la documentación solicitada líneas arriba.
+
+Nota: lo NO expresado/delimitado en el enunciado queda abierto a ser implementado a creatividad del evaluado.
