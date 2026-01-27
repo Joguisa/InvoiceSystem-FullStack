@@ -1,11 +1,13 @@
 using InvoiceSystem.Application.DTOs.Invoices;
 using InvoiceSystem.Application.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InvoiceSystem.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class InvoicesController : ControllerBase
 {
     private readonly IInvoiceService _invoiceService;
