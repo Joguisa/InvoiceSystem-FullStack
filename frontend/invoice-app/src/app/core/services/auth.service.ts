@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, Observable, map, tap } from 'rxjs';
 import { AuthResponse } from '../models/auth/auth-response.interface';
 import { LoginRequest } from '../models/auth/login-request.interface';
 import { environment } from '../../../environments/environment';
@@ -11,22 +11,34 @@ import { environment } from '../../../environments/environment';
 export class AuthService {
 
   private readonly apiUrl: string;
-  private tokenSubject = new BehaviorSubject<string | null>(
-    localStorage.getItem('token')
+  private tokenSubject = new BehaviorSubject<string | null>(null);
+  public readonly token$ = this.tokenSubject.asObservable();
+
+  public readonly isAuthenticated$ = this.token$.pipe(
+    map(token => {
+      if (!token) return false;
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return !payload.exp || payload.exp * 1000 > Date.now();
+      } catch {
+        return false;
+      }
+    })
   );
-  public token$ = this.tokenSubject.asObservable();
 
   constructor(private http: HttpClient) {
     this.apiUrl = environment.apiBaseUrl;
+    const storedToken = localStorage.getItem('token');
+    if (storedToken) {
+      this.tokenSubject.next(storedToken);
+    }
   }
 
   /**
-   * Autentica un administrador y retorna JWT token
-   *
-   * Backend: POST /auth/login
-   * @param email Email del administrador
-   * @param password Contraseña del administrador
-   * @returns Observable con token JWT si las credenciales son correctas
+   * Autentica y retorna token
+   * @param email
+   * @param password
+   * @returns
    */
   login(email: string, password: string): Observable<AuthResponse> {
     const body: LoginRequest = { email, password };
@@ -38,17 +50,15 @@ export class AuthService {
       .pipe(
         tap((response) => {
           if (response.ok && response.token) {
-            localStorage.setItem('token', response.token);
-            this.tokenSubject.next(response.token);
+            this.setToken(response.token);
           }
         })
       );
   }
 
   /**
-   * Establece el token JWT en localStorage y estado
-   *
-   * @param token JWT token a guardar
+   * Guarda el token en localStorage
+   * @param token
    */
   setToken(token: string): void {
     localStorage.setItem('token', token);
@@ -56,7 +66,6 @@ export class AuthService {
   }
 
   /**
-   * Cierra la sesión del administrador
    * Remueve el token de localStorage y limpia el estado
    */
   logout(): void {
@@ -65,52 +74,36 @@ export class AuthService {
   }
 
   /**
-   * Obtiene el token JWT actual
-   *
-   * @returns Token JWT o null si no existe
+   * Obtiene el token actual del estado
+   * @returns
    */
   getToken(): string | null {
-    // Read directly from localStorage to ensure we always get the latest value
-    const token = localStorage.getItem('token');
-
-    // Keep BehaviorSubject in sync if there's a mismatch
-    if (token !== this.tokenSubject.value) {
-      this.tokenSubject.next(token);
-    }
-
-    return token;
+    return this.tokenSubject.value;
   }
 
   /**
-   * Verifica si el usuario está autenticado
-   *
-   * @returns true si existe un token JWT válido
-   */
-  isAuthenticated(): boolean {
-    const token = this.getToken();
-    return !!token;
-  }
-
-  /**
-   * Decodifica el JWT y obtiene información del administrador actual
-   *
-   * @returns Datos del admin (id, email, role) o null si no hay token
+   * Valida el token y obtiene administrador actual
+   * @returns
    */
   getCurrentUser(): { id: number; email: string } | null {
     const token = this.getToken();
     if (!token) return null;
 
     try {
-      // Decodificar payload del JWT (base64)
       const payload = token.split('.')[1];
       const decoded = JSON.parse(atob(payload));
+
+      if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+        this.logout();
+        return null;
+      }
 
       return {
         id: decoded.id,
         email: decoded.email,
       };
     } catch (error) {
-      console.error('Error decodificando token JWT:', error);
+      this.logout();
       return null;
     }
   }

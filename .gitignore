@@ -484,17 +484,21 @@ $RECYCLE.BIN/
 *.swp
 
 # See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+# Angular / Frontend (global)
+**/.angular/
+**/.vite/
+**/node_modules/
+**/dist/
+**/out-tsc/
+*.tsbuildinfo
 
 # Compiled output
-dist/
 tmp/
-out-tsc/
 bazel-out/
 
 # Node
-node_modules/
-npm-debug.log
-yarn-error.log
+npm-debug.log*
+yarn-error.log*
 
 # IDEs and editors
 .idea/
@@ -514,10 +518,9 @@ yarn-error.log
 .history/*
 
 # Miscellaneous
-.angular/cache/
 .sass-cache/
-connect.lock
 coverage/
+connect.lock
 libpeerconnection.log
 testem.log
 typings/

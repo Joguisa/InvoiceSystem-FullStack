@@ -1,1 +1,11 @@
-<p>page-header works!</p>
+<div class="flex flex-column md:flex-row md:align-items-center justify-content-between mb-4 gap-3">
+    <div>
+        <h1 class="m-0 text-3xl font-bold">{{ title() }}</h1>
+        <p-breadcrumb *ngIf="breadcrumbs().length" [model]="breadcrumbs()"
+            styleClass="border-none p-0 mt-2 bg-transparent text-sm" />
+    </div>
+
+    <div *ngIf="showAddButton()">
+        <p-button [label]="addButtonLabel()" icon="pi pi-plus" [routerLink]="addRoute()" />
+    </div>
+</div>

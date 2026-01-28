@@ -1,1 +1,22 @@
-/* You can add global styles to this file, and also import other style files */
+// PrimeNG
+@import "primeflex/primeflex.css";
+@import "primeicons/primeicons.css";
+
+// Global
+html,
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: var(--font-family);
+}
+
+// Scrollbar opcional
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}

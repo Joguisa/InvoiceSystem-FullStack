@@ -4,20 +4,17 @@ import { AuthService } from '../services/auth.service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
-
   const token = authService.getToken();
 
-  const currentLang = localStorage.getItem('sg_ia_language') || 'es';
-
-  const headers: { [key: string]: string } = {
-    'Accept-Language': currentLang
-  };
-
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
+  if (!token) {
+    return next(req);
   }
 
-  req = req.clone({ setHeaders: headers });
+  const authReq = req.clone({
+    setHeaders: {
+      Authorization: `Bearer ${token}`
+    }
+  });
 
-  return next(req);
+  return next(authReq);
 };

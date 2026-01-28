@@ -1,58 +1,43 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
+import { MessageService } from 'primeng/api';
 import { HttpStatus } from '../constants/http-status.constants';
-import { NOTIFICATION_DURATION } from '../constants/notification-config.const';
-import { NotificationService } from './notification.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ErrorHandlerService {
-  private notification = inject(NotificationService);
+  private messageService = inject(MessageService);
 
   handle(error: HttpErrorResponse) {
+    let detail = 'Error desconocido. Intenta de nuevo.';
+
     switch (error.status) {
       case HttpStatus.NETWORK_ERROR:
-        this.notification.error(
-          'No hay conexión con el servidor. Verifica tu internet o intenta más tarde.',
-          NOTIFICATION_DURATION.LONG
-        );
+        detail = 'No hay conexión con el servidor. Verifica tu internet o intenta más tarde.';
         break;
       case HttpStatus.UNAUTHORIZED:
-        this.notification.error(
-          'Sesión expirada. Por favor inicia sesión nuevamente.',
-          NOTIFICATION_DURATION.LONG
-        );
+        detail = 'Sesión expirada. Por favor inicia sesión nuevamente.';
         break;
       case HttpStatus.FORBIDDEN:
-        this.notification.error(
-          'Acceso denegado.',
-          NOTIFICATION_DURATION.DEFAULT
-        );
+        detail = 'Acceso denegado.';
         break;
       case HttpStatus.NOT_FOUND:
-        this.notification.error(
-          'Recurso no encontrado.',
-          NOTIFICATION_DURATION.DEFAULT
-        );
+        detail = 'Recurso no encontrado.';
         break;
       case HttpStatus.INTERNAL_SERVER_ERROR:
-        this.notification.error(
-          'Error del servidor. Intenta más tarde.',
-          NOTIFICATION_DURATION.LONG
-        );
+        detail = 'Error del servidor. Intenta más tarde.';
         break;
       case HttpStatus.BAD_REQUEST:
-        this.notification.error(
-          'Solicitud inválida.',
-          NOTIFICATION_DURATION.DEFAULT
-        );
+        detail = 'Solicitud inválida.';
         break;
-      default:
-        this.notification.error(
-          'Error desconocido. Intenta de nuevo.',
-          NOTIFICATION_DURATION.DEFAULT
-        );
     }
+
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: detail,
+      life: 5000
+    });
   }
 }

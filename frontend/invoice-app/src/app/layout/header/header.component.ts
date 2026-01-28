@@ -1,12 +1,16 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ToolbarModule } from 'primeng/toolbar';
+import { ButtonModule } from 'primeng/button';
+import { AvatarModule } from 'primeng/avatar';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [],
+  imports: [CommonModule, ToolbarModule, ButtonModule, AvatarModule],
   templateUrl: './header.component.html',
-  styles: ``
+  styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent {
-
+  user = { name: 'Administrador' };
 }

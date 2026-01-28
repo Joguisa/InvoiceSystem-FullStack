@@ -1,1 +1,12 @@
-<p>main-layout works!</p>
+<div class="flex flex-column h-screen">
+    <app-header></app-header>
+    <div class="flex flex-grow-1 overflow-hidden">
+        <div class="w-18rem surface-section border-right-1 surface-border hidden md:block">
+            <app-sidebar></app-sidebar>
+        </div>
+        <div class="flex-grow-1 overflow-auto p-4 surface-ground">
+            <router-outlet></router-outlet>
+        </div>
+    </div>
+    <app-confirm-dialog></app-confirm-dialog>
+</div>

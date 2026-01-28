@@ -1,1 +1,16 @@
-<p>header works!</p>
+<p-toolbar styleClass="border-none border-bottom-1 surface-border border-noround p-0 px-4">
+    <ng-template pTemplate="start">
+        <div class="flex align-items-center gap-2">
+            <span class="text-xl font-bold">Gestión de Facturas</span>
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="end">
+        <div class="flex align-items-center gap-3">
+            <p-avatar icon="pi pi-user" styleClass="mr-2" shape="circle" />
+            <span class="font-semibold hidden md:block">{{ user.name }}</span>
+            <p-button icon="pi pi-sign-out" [text]="true" severity="danger" tooltipPosition="bottom"
+                pTooltip="Cerrar sesión"></p-button>
+        </div>
+    </ng-template>
+</p-toolbar>
