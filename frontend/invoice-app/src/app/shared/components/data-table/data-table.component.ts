@@ -21,7 +21,7 @@ export class DataTableComponent {
   @Input() loading: boolean = false;
   @Input() rows: number = 10;
   @Input() paginator: boolean = true;
-  @Input() lazy: boolean = true;
+  @Input() lazy: boolean = false;
   @Input() rowHover: boolean = true;
 
   @Output() onLazyLoad = new EventEmitter<TableLazyLoadEvent>();

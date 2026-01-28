@@ -31,7 +31,6 @@ export class CustomerListComponent implements OnInit {
     { field: 'name', header: 'Nombre', sortable: true },
     { field: 'email', header: 'Correo' },
     { field: 'phone', header: 'Teléfono' },
-    { field: 'isActive', header: 'Estado', type: 'status' },
     { field: 'actions', header: 'Acciones', type: 'actions' }
   ];
 

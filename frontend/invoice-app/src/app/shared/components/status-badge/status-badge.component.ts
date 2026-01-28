@@ -10,11 +10,27 @@ import { TagModule } from 'primeng/tag';
   styleUrls: ['./status-badge.component.scss']
 })
 export class StatusBadgeComponent {
-  status = input.required<string>();
+  status = input.required<any>();
+
+  displayValue = computed(() => {
+    const s = this.status();
+    if (typeof s === 'boolean') {
+      return s ? 'Activo' : 'Inactivo';
+    }
+    return s;
+  });
 
   severity = computed(() => {
-    const s = this.status().toLowerCase();
-    switch (s) {
+    const s = this.status();
+    let statusStr: string;
+
+    if (typeof s === 'boolean') {
+      statusStr = s ? 'active' : 'inactive';
+    } else {
+      statusStr = s.toLowerCase();
+    }
+
+    switch (statusStr) {
       case 'active':
       case 'paid':
       case 'completed':

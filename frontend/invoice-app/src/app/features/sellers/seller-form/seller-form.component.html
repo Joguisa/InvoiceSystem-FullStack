@@ -1,1 +1,52 @@
-<p>seller-form works!</p>
+<form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-column gap-4">
+    <div class="flex flex-column gap-2">
+        <label for="code">Código *</label>
+        <input pInputText id="code" formControlName="code" appInputMask="alphanumeric" [maxLength]="20"
+            [class.ng-invalid]="(submitted() || f['code'].touched) && f['code'].errors"
+            [class.ng-dirty]="(submitted() || f['code'].touched) && f['code'].errors" />
+        <small *ngIf="(submitted() || f['code'].touched) && f['code'].errors?.['required']" class="text-red-500">
+            Código es requerido.
+        </small>
+        <small *ngIf="(submitted() || f['code'].touched) && f['code'].errors?.['maxlength']" class="text-red-500">
+            Código no puede exceder 20 caracteres.
+        </small>
+    </div>
+
+    <div class="flex flex-column gap-2">
+        <label for="name">Nombre *</label>
+        <input pInputText id="name" formControlName="name"
+            [class.ng-invalid]="(submitted() || f['name'].touched) && f['name'].errors"
+            [class.ng-dirty]="(submitted() || f['name'].touched) && f['name'].errors" />
+        <small *ngIf="(submitted() || f['name'].touched) && f['name'].errors?.['required']" class="text-red-500">
+            Nombre es requerido.
+        </small>
+        <small *ngIf="(submitted() || f['name'].touched) && f['name'].errors?.['minlength']" class="text-red-500">
+            Nombre debe tener al menos 2 caracteres.
+        </small>
+    </div>
+
+    <div class="flex flex-column gap-2">
+        <label for="email">Correo</label>
+        <input pInputText id="email" formControlName="email" type="email"
+            [class.ng-invalid]="(submitted() || f['email'].touched) && f['email'].errors"
+            [class.ng-dirty]="(submitted() || f['email'].touched) && f['email'].errors" />
+        <small *ngIf="(submitted() || f['email'].touched) && f['email'].errors?.['email']" class="text-red-500">
+            Ingrese un correo válido.
+        </small>
+    </div>
+
+    <div class="flex flex-column gap-2">
+        <label for="phone">Teléfono</label>
+        <input pInputText id="phone" formControlName="phone" appInputMask="numeric" [maxLength]="15"
+            [class.ng-invalid]="(submitted() || f['phone'].touched) && f['phone'].errors"
+            [class.ng-dirty]="(submitted() || f['phone'].touched) && f['phone'].errors" />
+        <small *ngIf="(submitted() || f['phone'].touched) && f['phone'].errors?.['pattern']" class="text-red-500">
+            Teléfono debe tener entre 7-15 dígitos.
+        </small>
+    </div>
+
+    <div class="flex justify-content-end gap-2 mt-4">
+        <p-button label="Cancelar" severity="secondary" [text]="true" (onClick)="onCancel.emit()"></p-button>
+        <p-button label="Guardar" type="submit" [icon]="'pi pi-check'"></p-button>
+    </div>
+</form>

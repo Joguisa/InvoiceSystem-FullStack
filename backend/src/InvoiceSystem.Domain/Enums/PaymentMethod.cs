@@ -2,11 +2,11 @@ namespace InvoiceSystem.Domain.Enums;
 
 public enum PaymentMethod
 {
-    Cash = 0,
-    CreditCard = 1,
-    DebitCard = 2,
-    BankTransfer = 3,
-    Check = 4,
-    MobilePayment = 5,
-    ElectronicWallet = 6
+    Cash = 1,
+    CreditCard = 2,
+    DebitCard = 3,
+    BankTransfer = 4,
+    Check = 5,
+    MobilePayment = 6,
+    ElectronicWallet = 7
 }

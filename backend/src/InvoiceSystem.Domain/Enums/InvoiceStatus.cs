@@ -2,9 +2,9 @@ namespace InvoiceSystem.Domain.Enums;
 
 public enum InvoiceStatus
 {
-    Draft = 0,
-    Issued = 1,
-    PartiallyPaid = 2,
-    Paid = 3,
-    Cancelled = 4
+    Draft = 1,
+    Issued = 2,
+    PartiallyPaid = 3,
+    Paid = 4,
+    Cancelled = 5
 }

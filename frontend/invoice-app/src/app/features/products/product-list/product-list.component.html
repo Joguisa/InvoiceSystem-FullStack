@@ -1,1 +1,13 @@
-<p>product-list works!</p>
+<app-page-header title="Productos" [breadcrumbs]="breadcrumbs" [showAddButton]="true" addButtonLabel="Nuevo Producto"
+    (onAdd)="openNew()">
+</app-page-header>
+
+<app-data-table [data]="data()" [cols]="cols" [totalRecords]="totalRecords()" [loading]="loading()"
+    (onEdit)="onEdit($event)" (onDelete)="onDelete($event)">
+</app-data-table>
+
+<p-dialog header="{{ selectedProduct() ? 'Editar Producto' : 'Nuevo Producto' }}" [(visible)]="dialogVisible"
+    [modal]="true" [style]="{width: '600px'}" [closable]="true">
+    <app-product-form [product]="selectedProduct()" (onSave)="onFormSaved()" (onCancel)="dialogVisible.set(false)">
+    </app-product-form>
+</p-dialog>
