@@ -1,1 +1,13 @@
-<p>customer-list works!</p>
+<app-page-header title="Clientes" [breadcrumbs]="breadcrumbs" [showAddButton]="true" addButtonLabel="Nuevo Cliente"
+    (onAdd)="openNew()">
+</app-page-header>
+
+<app-data-table [data]="data()" [cols]="cols" [totalRecords]="totalRecords()" [loading]="loading()"
+    (onEdit)="onEdit($event)" (onDelete)="onDelete($event)" (onLazyLoad)="onLazyLoad($event)">
+</app-data-table>
+
+<p-dialog header="{{ selectedCustomer() ? 'Editar Cliente' : 'Nuevo Cliente' }}" [(visible)]="dialogVisible"
+    [modal]="true" [style]="{width: '500px'}" [closable]="true">
+    <app-customer-form [customer]="selectedCustomer()" (onSave)="onFormSaved()" (onCancel)="dialogVisible.set(false)">
+    </app-customer-form>
+</p-dialog>

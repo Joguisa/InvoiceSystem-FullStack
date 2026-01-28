@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, EventEmitter, Output, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
@@ -18,4 +18,5 @@ export class PageHeaderComponent {
   showAddButton = input<boolean>(false);
   addButtonLabel = input<string>('Nuevo');
   addRoute = input<string[] | string | null>(null);
+  @Output() onAdd = new EventEmitter<void>();
 }

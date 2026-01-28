@@ -36,20 +36,21 @@ export class AuthService {
 
   /**
    * Autentica y retorna token
-   * @param email
+   * @param username
    * @param password
    * @returns
    */
-  login(email: string, password: string): Observable<AuthResponse> {
-    const body: LoginRequest = { email, password };
+  login(username: string, password: string): Observable<AuthResponse> {
+    const body: LoginRequest = { username, password };
+    const url = `${this.apiUrl}${environment.apiEndpoints.auth.login}`;
+    console.log('[AuthService] Login URL:', url);
+    console.log('[AuthService] Login body:', body);
     return this.http
-      .post<AuthResponse>(
-        `${this.apiUrl}${environment.apiEndpoints.auth.login}`,
-        body
-      )
+      .post<AuthResponse>(url, body)
       .pipe(
         tap((response) => {
-          if (response.ok && response.token) {
+          console.log('[AuthService] Login response:', response);
+          if (response.token) {
             this.setToken(response.token);
           }
         })

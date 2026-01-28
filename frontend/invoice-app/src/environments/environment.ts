@@ -1,6 +1,6 @@
 export const environment = {
     production: false,
-    apiBaseUrl: 'http://localhost:5000/api',
+    apiBaseUrl: 'https://localhost:7145/api',
     apiEndpoints: {
         auth: {
             login: '/auth/login',

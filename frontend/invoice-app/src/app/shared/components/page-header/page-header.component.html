@@ -6,6 +6,10 @@
     </div>
 
     <div *ngIf="showAddButton()">
-        <p-button [label]="addButtonLabel()" icon="pi pi-plus" [routerLink]="addRoute()" />
+        <p-button *ngIf="addRoute(); else modalButton" [label]="addButtonLabel()" icon="pi pi-plus"
+            [routerLink]="addRoute()" />
+        <ng-template #modalButton>
+            <p-button [label]="addButtonLabel()" icon="pi pi-plus" (onClick)="onAdd.emit()" />
+        </ng-template>
     </div>
 </div>

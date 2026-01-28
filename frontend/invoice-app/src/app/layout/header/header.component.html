@@ -13,7 +13,7 @@
             <p-avatar icon="pi pi-user" styleClass="mr-2" shape="circle" />
             <span class="font-semibold hidden md:block">{{ user.name }}</span>
             <p-button icon="pi pi-sign-out" [text]="true" severity="danger" tooltipPosition="bottom"
-                pTooltip="Cerrar sesión"></p-button>
+                pTooltip="Cerrar sesión" (onClick)="logout()"></p-button>
         </div>
     </ng-template>
 </p-toolbar>

@@ -1,1 +1,41 @@
-<p>login works!</p>
+<div class="flex align-items-center justify-content-center h-screen surface-ground">
+    <p-card styleClass="w-full md:w-25rem shadow-3">
+        <ng-template pTemplate="header">
+            <div class="text-center pt-4">
+                <h1 class="text-2xl font-bold text-primary m-0">Gestión de Facturas</h1>
+                <p class="text-500 mt-2">Ingresa tus credenciales</p>
+            </div>
+        </ng-template>
+
+        <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-column gap-4">
+            <div class="flex flex-column gap-2">
+                <label for="username">Usuario</label>
+                <input pInputText id="username" formControlName="username" class="w-full"
+                    [class.ng-invalid]="(submitted() || f['username'].touched) && f['username'].errors"
+                    [class.ng-dirty]="(submitted() || f['username'].touched) && f['username'].errors" />
+                <small *ngIf="(submitted() || f['username'].touched) && f['username'].errors?.['required']"
+                    class="text-red-500">
+                    El usuario es requerido.
+                </small>
+            </div>
+
+            <div class="flex flex-column gap-2">
+                <label for="password">Contraseña</label>
+                <p-password id="password" formControlName="password" [feedback]="false" [toggleMask]="true"
+                    styleClass="w-full" inputStyleClass="w-full"
+                    [class.ng-invalid]="(submitted() || f['password'].touched) && f['password'].errors"
+                    [class.ng-dirty]="(submitted() || f['password'].touched) && f['password'].errors"></p-password>
+                <small *ngIf="(submitted() || f['password'].touched) && f['password'].errors?.['required']"
+                    class="text-red-500">
+                    La contraseña es requerida.
+                </small>
+            </div>
+
+            <div *ngIf="errorMessage()" class="p-3 border-round bg-red-100 text-red-700">
+                <i class="pi pi-exclamation-circle mr-2"></i>{{ errorMessage() }}
+            </div>
+
+            <p-button type="submit" label="Iniciar Sesión" [loading]="loading()" styleClass="w-full"></p-button>
+        </form>
+    </p-card>
+</div>
