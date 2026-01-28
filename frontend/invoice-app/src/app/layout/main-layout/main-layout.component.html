@@ -1,9 +1,17 @@
 <div class="flex flex-column h-screen">
-    <app-header></app-header>
+    <app-header (onToggleSidebar)="toggleSidebar()"></app-header>
+
     <div class="flex flex-grow-1 overflow-hidden">
+        <!-- Desktop Sidebar -->
         <div class="w-18rem surface-section border-right-1 surface-border hidden md:block">
             <app-sidebar></app-sidebar>
         </div>
+
+        <!-- Mobile Sidebar -->
+        <p-sidebar [(visible)]="sidebarVisible" styleClass="w-18rem p-0">
+            <app-sidebar></app-sidebar>
+        </p-sidebar>
+
         <div class="flex-grow-1 overflow-auto p-4 surface-ground">
             <router-outlet></router-outlet>
         </div>

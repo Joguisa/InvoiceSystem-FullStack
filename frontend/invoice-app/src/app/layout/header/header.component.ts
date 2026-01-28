@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ToolbarModule } from 'primeng/toolbar';
 import { ButtonModule } from 'primeng/button';
@@ -12,5 +12,6 @@ import { AvatarModule } from 'primeng/avatar';
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent {
+  @Output() onToggleSidebar = new EventEmitter<void>();
   user = { name: 'Administrador' };
 }

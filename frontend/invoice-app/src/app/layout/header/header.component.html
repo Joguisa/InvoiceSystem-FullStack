@@ -1,6 +1,9 @@
-<p-toolbar styleClass="border-none border-bottom-1 surface-border border-noround p-0 px-4">
+<p-toolbar
+    styleClass="border-none border-bottom-1 surface-border border-noround p-3 flex align-items-center min-h-4rem">
     <ng-template pTemplate="start">
         <div class="flex align-items-center gap-2">
+            <p-button icon="pi pi-bars" [text]="true" styleClass="md:hidden mr-2" (onClick)="onToggleSidebar.emit()">
+            </p-button>
             <span class="text-xl font-bold">Gestión de Facturas</span>
         </div>
     </ng-template>
