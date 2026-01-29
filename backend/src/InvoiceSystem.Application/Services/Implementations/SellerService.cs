@@ -38,11 +38,22 @@ public class SellerService : ISellerService
 
     public async Task<Result<SellerDto>> CreateAsync(CreateSellerRequest request, CancellationToken cancellationToken = default)
     {
-        var exists = await _unitOfWork.Sellers.ExistsAsync(
-            s => s.Code == request.Code, cancellationToken);
+        var sellers = await _unitOfWork.Sellers.FindAsync(s => s.Code == request.Code, cancellationToken);
+        var existing = sellers.FirstOrDefault();
         
-        if (exists)
-            return Result<SellerDto>.Failure("Ya existe un vendedor con este código");
+        if (existing != null)
+        {
+            if (existing.IsActive)
+                return Result<SellerDto>.Failure("Ya existe un vendedor activo con este código");
+                
+            _mapper.Map(request, existing);
+            existing.IsActive = true;
+            
+            _unitOfWork.Sellers.Update(existing);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            
+            return Result<SellerDto>.Success(_mapper.Map<SellerDto>(existing));
+        }
 
         var seller = _mapper.Map<Seller>(request);
         await _unitOfWork.Sellers.AddAsync(seller, cancellationToken);

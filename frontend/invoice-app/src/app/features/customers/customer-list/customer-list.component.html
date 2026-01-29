@@ -3,7 +3,7 @@
 </app-page-header>
 
 <app-data-table [data]="data()" [cols]="cols" [totalRecords]="totalRecords()" [loading]="loading()"
-    (onEdit)="onEdit($event)" (onDelete)="onDelete($event)" (onLazyLoad)="onLazyLoad($event)">
+    (onEdit)="onEdit($event)" (onDelete)="onDelete($event)">
 </app-data-table>
 
 <p-dialog header="{{ selectedCustomer() ? 'Editar Cliente' : 'Nuevo Cliente' }}" [(visible)]="dialogVisible"

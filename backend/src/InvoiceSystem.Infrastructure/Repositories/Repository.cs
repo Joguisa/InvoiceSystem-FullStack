@@ -21,6 +21,18 @@ public class Repository<T> : IRepository<T> where T : class
         return await _dbSet.FindAsync(new object[] { id }, cancellationToken);
     }
 
+    public async Task<T?> GetByIdWithIncludesAsync(Guid id, string[] includes, CancellationToken cancellationToken = default)
+    {
+        IQueryable<T> query = _dbSet;
+        
+        foreach (var include in includes)
+        {
+            query = query.Include(include);
+        }
+
+        return await query.FirstOrDefaultAsync(e => EF.Property<Guid>(e, "Id") == id, cancellationToken);
+    }
+
     public async Task<IEnumerable<T>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         return await _dbSet.ToListAsync(cancellationToken);
@@ -29,6 +41,16 @@ public class Repository<T> : IRepository<T> where T : class
     public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
     {
         return await _dbSet.Where(predicate).ToListAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<T>> FindWithIncludesAsync(Expression<Func<T, bool>> predicate, string[] includes, CancellationToken cancellationToken = default)
+    {
+        IQueryable<T> query = _dbSet;
+        foreach (var include in includes)
+        {
+            query = query.Include(include);
+        }
+        return await query.Where(predicate).ToListAsync(cancellationToken);
     }
 
     public async Task<T> AddAsync(T entity, CancellationToken cancellationToken = default)

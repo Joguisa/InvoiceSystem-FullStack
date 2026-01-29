@@ -1,1 +1,206 @@
-<p>invoice-detail works!</p>
+<app-page-header [title]="'Factura ' + (invoice()?.invoiceNumber || '')" [breadcrumbs]="breadcrumbs">
+</app-page-header>
+
+<ng-container *ngIf="!loading() && invoice()">
+    <div class="grid">
+        <!-- Left Column: Invoice Info + Details -->
+        <div class="col-12 lg:col-8">
+            <!-- Invoice Header Info -->
+            <p-card styleClass="mb-4">
+                <div class="flex flex-wrap justify-content-between align-items-start gap-3">
+                    <div>
+                        <h2 class="m-0 mb-2 text-primary">{{ invoice()?.invoiceNumber }}</h2>
+                        <p-tag [value]="getStatusLabel(invoice()!.status)"
+                            [severity]="getStatusSeverity(invoice()!.status)" [rounded]="true"></p-tag>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-500 mb-1">Fecha de Emisión</div>
+                        <div class="text-xl font-semibold">{{ invoice()?.issueDate | date:'dd/MM/yyyy' }}</div>
+                    </div>
+                </div>
+
+                <p-divider></p-divider>
+
+                <div class="grid">
+                    <div class="col-12 md:col-6">
+                        <div class="text-500 mb-1">Cliente</div>
+                        <div class="font-semibold text-lg">{{ invoice()?.customerName }}</div>
+                        <div class="text-500">{{ invoice()?.customerIdentification }}</div>
+                        <div *ngIf="invoice()?.customerPhone" class="text-500 text-sm mt-1">
+                            <i class="pi pi-phone mr-1"></i>{{ invoice()?.customerPhone }}
+                        </div>
+                        <div *ngIf="invoice()?.customerEmail" class="text-500 text-sm">
+                            <i class="pi pi-envelope mr-1"></i>{{ invoice()?.customerEmail }}
+                        </div>
+                    </div>
+                    <div class="col-12 md:col-6">
+                        <div class="text-500 mb-1">Vendedor</div>
+                        <div class="font-semibold text-lg">{{ invoice()?.sellerName }}</div>
+                    </div>
+                </div>
+
+                <div *ngIf="invoice()?.notes" class="mt-3">
+                    <div class="text-500 mb-1">Notas</div>
+                    <div>{{ invoice()?.notes }}</div>
+                </div>
+            </p-card>
+
+            <!-- Invoice Details -->
+            <p-card header="Detalle de Productos" styleClass="mb-4">
+                <p-table [value]="invoice()?.details || []" styleClass="p-datatable-sm">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>Producto</th>
+                            <th class="text-center">Cantidad</th>
+                            <th class="text-right">P. Unitario</th>
+                            <th class="text-right">Descuento</th>
+                            <th class="text-right">Total Línea</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-detail>
+                        <tr>
+                            <td>
+                                <span class="font-semibold">{{ detail.productCode }}</span> - {{ detail.productName }}
+                            </td>
+                            <td class="text-center">{{ detail.quantity }}</td>
+                            <td class="text-right">{{ detail.unitPrice | currency }}</td>
+                            <td class="text-right">{{ detail.discount | currency }}</td>
+                            <td class="text-right font-semibold">{{ detail.lineTotal | currency }}</td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </p-card>
+
+            <!-- Payments -->
+            <p-card header="Historial de Pagos">
+                <p-table [value]="invoice()?.payments || []" styleClass="p-datatable-sm">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Método</th>
+                            <th>Referencia</th>
+                            <th class="text-right">Monto</th>
+                            <th class="text-center">Estado</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-payment>
+                        <tr [class.line-through]="payment.isVoided" [class.text-400]="payment.isVoided">
+                            <td>{{ payment.paymentDate | date:'dd/MM/yyyy HH:mm' }}</td>
+                            <td>
+                                {{ payment.paymentMethodName }}
+                                <div *ngIf="payment.paymentMethod === 2 && payment.installments > 1"
+                                    class="text-xs text-500">
+                                    Dif. {{ payment.installments }} meses
+                                </div>
+                            </td>
+                            <td>{{ payment.reference || '-' }}</td>
+                            <td class="text-right font-semibold">{{ payment.amount | currency }}</td>
+                            <td class="text-center">
+                                <p-tag *ngIf="payment.isVoided" value="Anulado" severity="danger"
+                                    [rounded]="true"></p-tag>
+                                <p-tag *ngIf="!payment.isVoided" value="Válido" severity="success"
+                                    [rounded]="true"></p-tag>
+                            </td>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="emptymessage">
+                        <tr>
+                            <td colspan="5" class="text-center p-3 text-500">No hay pagos registrados.</td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </p-card>
+        </div>
+
+        <!-- Right Column: Totals + Actions -->
+        <div class="col-12 lg:col-4">
+            <!-- Totals -->
+            <p-card header="Resumen" styleClass="mb-4">
+                <div class="flex justify-content-between mb-2">
+                    <span>Subtotal</span>
+                    <span class="font-semibold">{{ invoice()?.subtotal | currency }}</span>
+                </div>
+                <div class="flex justify-content-between mb-2">
+                    <span>IVA ({{ invoice()?.taxRate }}%)</span>
+                    <span class="font-semibold">{{ invoice()?.taxAmount | currency }}</span>
+                </div>
+                <p-divider></p-divider>
+                <div class="flex justify-content-between mb-2">
+                    <span class="text-xl font-bold">TOTAL</span>
+                    <span class="text-xl font-bold text-primary">{{ invoice()?.total | currency }}</span>
+                </div>
+                <p-divider></p-divider>
+                <div class="flex justify-content-between mb-2">
+                    <span>Total Pagado</span>
+                    <span class="font-semibold text-green-500">{{ invoice()?.totalPaid | currency }}</span>
+                </div>
+                <div class="flex justify-content-between">
+                    <span class="font-bold">Pendiente</span>
+                    <span class="font-bold" [class.text-red-500]="invoice()!.pendingAmount > 0"
+                        [class.text-green-500]="invoice()!.pendingAmount <= 0">
+                        {{ invoice()?.pendingAmount | currency }}
+                    </span>
+                </div>
+            </p-card>
+
+            <!-- Actions -->
+            <p-card header="Acciones">
+                <div class="flex flex-column gap-2">
+                    <p-button label="Registrar Pago" icon="pi pi-wallet" styleClass="w-full"
+                        (onClick)="openPaymentDialog()"
+                        [disabled]="invoice()!.status === 4 || invoice()!.status === 5"></p-button>
+                    <p-button label="Anular Factura" icon="pi pi-ban" severity="danger" [outlined]="true"
+                        styleClass="w-full" (onClick)="cancelInvoice()" [disabled]="invoice()!.status === 5"></p-button>
+                    <p-button label="Volver al Listado" icon="pi pi-arrow-left" severity="secondary" [text]="true"
+                        styleClass="w-full" (onClick)="goBack()"></p-button>
+                </div>
+            </p-card>
+        </div>
+    </div>
+</ng-container>
+
+<!-- Loading -->
+<div *ngIf="loading()" class="flex justify-content-center align-items-center" style="height: 300px;">
+    <i class="pi pi-spin pi-spinner text-4xl text-primary"></i>
+</div>
+
+<!-- Add Payment Dialog -->
+<p-dialog header="Registrar Pago" [(visible)]="paymentDialogVisible" [modal]="true" [style]="{width: '450px'}"
+    [closable]="true">
+    <div class="flex flex-column gap-4" [formGroup]="paymentForm">
+        <div>
+            <label class="block mb-2 font-semibold">Método de Pago *</label>
+            <p-select formControlName="paymentMethod" [options]="paymentMethods" optionLabel="label" optionValue="value"
+                styleClass="w-full"></p-select>
+        </div>
+        <div>
+            <label class="block mb-2 font-semibold">Monto *</label>
+            <p-inputNumber formControlName="amount" mode="currency" currency="USD" [min]="0.01"
+                (onFocus)="selectOnFocus($event)" styleClass="w-full" class="w-full"
+                inputStyleClass="w-full"></p-inputNumber>
+            <small *ngIf="pf['amount'].touched && pf['amount'].errors?.['min']" class="text-red-500">
+                El monto debe ser mayor a 0.
+            </small>
+        </div>
+        <div *ngIf="pf['paymentMethod'].value === 2"> <!-- 2 = CreditCard -->
+            <label class="block mb-2 font-semibold">Diferido (Meses)</label>
+            <p-inputNumber formControlName="installments" mode="decimal" [min]="0" [max]="60" [maxlength]="2"
+                [showButtons]="true" suffix=" Meses" (onFocus)="selectOnFocus($event)" styleClass="w-full"
+                inputStyleClass="w-full" placeholder="0 = Corriente"></p-inputNumber>
+            <small class="text-500 block mt-1">0 o 1 = Corriente / Rotativo. Máx. 60 meses.</small>
+        </div>
+        <div>
+            <label class="block mb-2 font-semibold">Referencia</label>
+            <input pInputText formControlName="reference" class="w-full" [placeholder]="referencePlaceholder" />
+        </div>
+        <div>
+            <label class="block mb-2 font-semibold">Notas</label>
+            <input pInputText formControlName="notes" class="w-full" placeholder="Observaciones..." />
+        </div>
+    </div>
+    <ng-template pTemplate="footer">
+        <p-button label="Cancelar" [text]="true" severity="secondary" (onClick)="closePaymentDialog()"></p-button>
+        <p-button label="Registrar" icon="pi pi-check" (onClick)="addPayment()"
+            [disabled]="paymentForm.invalid"></p-button>
+    </ng-template>
+</p-dialog>

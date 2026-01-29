@@ -7,6 +7,7 @@ import { PasswordModule } from 'primeng/password';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { AuthService } from '../../../core/services/auth.service';
+import { HttpStatus } from '../../../core/constants/http-status.constants';
 
 @Component({
   selector: 'app-login',
@@ -48,8 +49,23 @@ export class LoginComponent {
       },
       error: (err) => {
         this.loading.set(false);
-        this.errorMessage.set(err.error?.error || 'Credenciales inválidas');
+        this.errorMessage.set(this.getErrorMessage(err));
       }
     });
+  }
+
+  private getErrorMessage(err: any): string {
+    switch (err.status) {
+      case HttpStatus.NETWORK_ERROR:
+        return 'No se puede conectar al servidor. Verifique su conexión.';
+      case HttpStatus.INTERNAL_SERVER_ERROR:
+        return 'Error del servidor. Intente más tarde.';
+      case HttpStatus.UNAUTHORIZED:
+        return err.error?.error || err.error?.message || 'Credenciales inválidas';
+      case HttpStatus.BAD_REQUEST:
+        return err.error?.error || err.error?.message || 'Datos de acceso incorrectos';
+      default:
+        return err.error?.error || err.error?.message || 'Error al iniciar sesión';
+    }
   }
 }

@@ -38,11 +38,22 @@ public class ProductService : IProductService
 
     public async Task<Result<ProductDto>> CreateAsync(CreateProductRequest request, CancellationToken cancellationToken = default)
     {
-        var exists = await _unitOfWork.Products.ExistsAsync(
-            p => p.Code == request.Code, cancellationToken);
+        var products = await _unitOfWork.Products.FindAsync(p => p.Code == request.Code, cancellationToken);
+        var existingProduct = products.FirstOrDefault();
         
-        if (exists)
-            return Result<ProductDto>.Failure("Ya existe un producto con este código");
+        if (existingProduct != null)
+        {
+            if (existingProduct.IsActive)
+                return Result<ProductDto>.Failure("Ya existe un producto activo con este código");
+                
+            _mapper.Map(request, existingProduct);
+            existingProduct.IsActive = true;
+            
+            _unitOfWork.Products.Update(existingProduct);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            
+            return Result<ProductDto>.Success(_mapper.Map<ProductDto>(existingProduct));
+        }
 
         var product = _mapper.Map<Product>(request);
         await _unitOfWork.Products.AddAsync(product, cancellationToken);

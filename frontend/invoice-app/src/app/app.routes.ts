@@ -17,6 +17,14 @@ export const routes: Routes = [
                 loadComponent: () => import('./features/invoices/invoice-list/invoice-list.component').then(c => c.InvoiceListComponent)
             },
             {
+                path: 'invoices/new',
+                loadComponent: () => import('./features/invoices/invoice-form/invoice-form.component').then(c => c.InvoiceFormComponent)
+            },
+            {
+                path: 'invoices/:id',
+                loadComponent: () => import('./features/invoices/invoice-detail/invoice-detail.component').then(c => c.InvoiceDetailComponent)
+            },
+            {
                 path: 'customers',
                 loadComponent: () => import('./features/customers/customer-list/customer-list.component').then(c => c.CustomerListComponent)
             },

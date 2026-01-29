@@ -10,6 +10,12 @@ public class Invoice : BaseEntity
     // Foreign Keys
     public Guid CustomerId { get; set; }
     public Guid SellerId { get; set; }
+
+    // Customer
+    public string CustomerName { get; set; } = string.Empty;
+    public string CustomerIdentification { get; set; } = string.Empty;
+    public string? CustomerPhone { get; set; }
+    public string? CustomerEmail { get; set; }
     
     // Totals
     public decimal Subtotal { get; set; }

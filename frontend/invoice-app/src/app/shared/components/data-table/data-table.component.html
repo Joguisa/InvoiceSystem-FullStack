@@ -1,7 +1,6 @@
 <div class="card p-0">
     <p-table [value]="data" [columns]="cols" [paginator]="paginator" [rows]="rows" [totalRecords]="totalRecords"
-        [loading]="loading" [lazy]="lazy" (onLazyLoad)="lazyLoad($event)" [rowHover]="rowHover"
-        styleClass="p-datatable-sm" [showCurrentPageReport]="true"
+        [loading]="loading" [rowHover]="rowHover" styleClass="p-datatable-sm" [showCurrentPageReport]="true"
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
         [rowsPerPageOptions]="[10, 25, 50]">
 

@@ -1,4 +1,108 @@
-<app-page-header title="Listado de Facturas" [breadcrumbs]="breadcrumbs" [showAddButton]="true"
-    addButtonLabel="Nueva Factura" addRoute="/invoices/new">
+<app-page-header title="Facturas" [breadcrumbs]="breadcrumbs" [showAddButton]="true" addButtonLabel="Nueva Factura"
+    (onAdd)="openNew()">
 </app-page-header>
-<p class="m-3">Módulo en construcción...</p>
+
+<div class="card mb-4" [formGroup]="filterForm">
+    <div class="grid">
+        <div class="col-12 md:col-3">
+            <label class="block mb-2 font-semibold">Nro. Factura</label>
+            <input pInputText formControlName="invoiceNumber" placeholder="Buscar por número..." class="w-full"
+                (keyup.enter)="onFilterChange()" />
+        </div>
+
+        <div class="col-12 md:col-3">
+            <label class="block mb-2 font-semibold">Rango de Fechas</label>
+            <p-datepicker formControlName="dateRange" selectionMode="range" dateFormat="dd/mm/yy"
+                placeholder="Desde - Hasta" [showIcon]="true" styleClass="w-full" (onClose)="onFilterChange()">
+            </p-datepicker>
+        </div>
+
+        <div class="col-12 md:col-3">
+            <label class="block mb-2 font-semibold">Cliente</label>
+            <p-select formControlName="customerId" [options]="customers()" optionLabel="label" optionValue="value"
+                placeholder="Todos" styleClass="w-full" (onChange)="onFilterChange()">
+            </p-select>
+        </div>
+
+        <div class="col-12 md:col-3">
+            <label class="block mb-2 font-semibold">Vendedor</label>
+            <p-select formControlName="sellerId" [options]="sellers()" optionLabel="label" optionValue="value"
+                placeholder="Todos" styleClass="w-full" (onChange)="onFilterChange()">
+            </p-select>
+        </div>
+
+        <div class="col-12 md:col-3">
+            <label class="block mb-2 font-semibold">Estado</label>
+            <p-select formControlName="status" [options]="statusOptions" optionLabel="label" optionValue="value"
+                placeholder="Todos" styleClass="w-full" (onChange)="onFilterChange()">
+            </p-select>
+        </div>
+
+        <div class="col-12 md:col-9 flex align-items-end justify-content-end gap-2">
+            <p-button label="Limpiar" icon="pi pi-filter-slash" severity="secondary" [text]="true"
+                (onClick)="clearFilters()"></p-button>
+            <p-button label="Buscar" icon="pi pi-search" (onClick)="onFilterChange()"></p-button>
+        </div>
+    </div>
+</div>
+
+<div class="card p-0">
+    <p-table [value]="invoices()" [loading]="loading()" [paginator]="true" [rows]="rows" [(first)]="first"
+        [totalRecords]="totalRecords()" [lazy]="true" (onLazyLoad)="onLazyLoad($event)" [showCurrentPageReport]="true"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} facturas"
+        [rowsPerPageOptions]="[10, 25, 50]" [rowHover]="true" styleClass="p-datatable-sm">
+
+        <ng-template pTemplate="header">
+            <tr>
+                <th pSortableColumn="invoiceNumber">Nro. Factura <p-sortIcon field="invoiceNumber"></p-sortIcon></th>
+                <th pSortableColumn="issueDate">Fecha <p-sortIcon field="issueDate"></p-sortIcon></th>
+                <th>Cliente</th>
+                <th>Vendedor</th>
+                <th pSortableColumn="total" class="text-right">Total <p-sortIcon field="total"></p-sortIcon></th>
+                <th pSortableColumn="pendingAmount" class="text-right">Pendiente</th>
+                <th>Estado</th>
+                <th class="text-center">Acciones</th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-invoice>
+            <tr>
+                <td>
+                    <span class="font-semibold text-primary cursor-pointer" (click)="viewInvoice(invoice)">
+                        {{ invoice.invoiceNumber }}
+                    </span>
+                </td>
+                <td>{{ invoice.issueDate | date:'dd/MM/yyyy' }}</td>
+                <td>
+                    <div>{{ invoice.customerName }}</div>
+                    <small class="text-500">{{ invoice.customerIdentification }}</small>
+                </td>
+                <td>{{ invoice.sellerName }}</td>
+                <td class="text-right font-semibold">{{ invoice.total | currency:'USD':'symbol' }}</td>
+                <td class="text-right" [class.text-red-500]="invoice.pendingAmount > 0">
+                    {{ invoice.pendingAmount | currency:'USD':'symbol' }}
+                </td>
+                <td>
+                    <p-tag [value]="getStatusLabel(invoice.status)" [severity]="getStatusSeverity(invoice.status)"
+                        [rounded]="true"></p-tag>
+                </td>
+                <td class="text-center">
+                    <div class="flex justify-content-center gap-1">
+                        <p-button icon="pi pi-eye" [text]="true" severity="info" (onClick)="viewInvoice(invoice)"
+                            pTooltip="Ver Factura" tooltipPosition="top"></p-button>
+                        <p-button icon="pi pi-ban" [text]="true" severity="danger" (onClick)="cancelInvoice(invoice)"
+                            pTooltip="Anular" tooltipPosition="top" *ngIf="invoice.status !== 5"></p-button>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="8" class="text-center p-4">
+                    <span class="text-500 font-semibold">No se encontraron facturas.</span>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>

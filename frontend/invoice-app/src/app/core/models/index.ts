@@ -6,3 +6,5 @@ export * from './enums/payment-method.enum';
 export * from './customer/customer.interface';
 export * from './seller/seller.interface';
 export * from './product/product.interface';
+export * from './invoice/invoice.interface';
+export * from './common/paged-result.interface';

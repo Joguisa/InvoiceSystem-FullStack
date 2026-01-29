@@ -15,6 +15,7 @@ public class InvoicePayment
     public string? Reference { get; set; } // Nro. transacción, autorización, etc.
     public string? CardLastFourDigits { get; set; } // Para tarjetas: "1234"
     public string? BankName { get; set; } // Para transferencias/cheques
+    public int? Installments { get; set; }
     public DateTime PaymentDate { get; set; }
     public string? Notes { get; set; }
     

@@ -29,7 +29,7 @@ export class ErrorHandlerService {
         detail = 'Error del servidor. Intenta más tarde.';
         break;
       case HttpStatus.BAD_REQUEST:
-        detail = 'Solicitud inválida.';
+        detail = error.error?.error || 'Solicitud inválida.';
         break;
     }
 

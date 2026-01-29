@@ -1,6 +1,6 @@
-import { Component, EventEmitter, Input, Output, TemplateRef } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TableLazyLoadEvent, TableModule } from 'primeng/table';
+import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
@@ -21,16 +21,10 @@ export class DataTableComponent {
   @Input() loading: boolean = false;
   @Input() rows: number = 10;
   @Input() paginator: boolean = true;
-  @Input() lazy: boolean = false;
   @Input() rowHover: boolean = true;
 
-  @Output() onLazyLoad = new EventEmitter<TableLazyLoadEvent>();
   @Output() onEdit = new EventEmitter<any>();
   @Output() onDelete = new EventEmitter<any>();
-
-  lazyLoad(event: TableLazyLoadEvent) {
-    this.onLazyLoad.emit(event);
-  }
 
   edit(row: any) {
     this.onEdit.emit(row);

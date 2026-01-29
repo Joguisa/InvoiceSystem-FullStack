@@ -38,11 +38,22 @@ public class CustomerService : ICustomerService
 
     public async Task<Result<CustomerDto>> CreateAsync(CreateCustomerRequest request, CancellationToken cancellationToken = default)
     {
-        var exists = await _unitOfWork.Customers.ExistsAsync(
-            c => c.Identification == request.Identification, cancellationToken);
+        var customers = await _unitOfWork.Customers.FindAsync(c => c.Identification == request.Identification, cancellationToken);
+        var existing = customers.FirstOrDefault();
         
-        if (exists)
-            return Result<CustomerDto>.Failure("Ya existe un cliente con esta identificación");
+        if (existing != null)
+        {
+            if (existing.IsActive)
+                return Result<CustomerDto>.Failure("Ya existe un cliente activo con esta identificación");
+                
+            _mapper.Map(request, existing);
+            existing.IsActive = true;
+            
+            _unitOfWork.Customers.Update(existing);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            
+            return Result<CustomerDto>.Success(_mapper.Map<CustomerDto>(existing));
+        }
 
         var customer = _mapper.Map<Customer>(request);
         await _unitOfWork.Customers.AddAsync(customer, cancellationToken);

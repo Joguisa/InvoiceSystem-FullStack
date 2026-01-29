@@ -12,6 +12,8 @@ public class InvoiceDto
     public Guid CustomerId { get; set; }
     public string CustomerName { get; set; } = string.Empty;
     public string CustomerIdentification { get; set; } = string.Empty;
+    public string? CustomerPhone { get; set; }
+    public string? CustomerEmail { get; set; }
     
     // Seller
     public Guid SellerId { get; set; }

@@ -1,1 +1,208 @@
-<p>invoice-form works!</p>
+<app-page-header title="Nueva Factura" [breadcrumbs]="breadcrumbs">
+</app-page-header>
+
+<form [formGroup]="form" (ngSubmit)="submit()">
+    <div class="grid">
+        <div class="col-12 lg:col-8">
+            <p-card header="Información de Factura" styleClass="mb-4">
+                <div class="grid">
+                    <div class="col-12 md:col-6">
+                        <label class="block mb-2 font-semibold">Cliente *</label>
+                        <p-select formControlName="customerId" [options]="customers()" optionLabel="name"
+                            optionValue="id" placeholder="Seleccione cliente" [filter]="true"
+                            filterBy="name,identification" styleClass="w-full"
+                            [class.ng-invalid]="(submitted() || f['customerId'].touched) && f['customerId'].errors"
+                            [class.ng-dirty]="(submitted() || f['customerId'].touched) && f['customerId'].errors"
+                            (onChange)="onCustomerChange($event)">
+                            <ng-template pTemplate="item" let-customer>
+                                <div>
+                                    <span class="font-semibold">{{ customer.name }}</span>
+                                    <br>
+                                    <small class="text-500">{{ customer.identification }}</small>
+                                </div>
+                            </ng-template>
+                        </p-select>
+                        <div *ngIf="selectedCustomer()" class="mt-2 p-2 surface-100 border-round text-sm">
+                            <div><span class="font-semibold">ID:</span> {{ selectedCustomer()!.identification }}</div>
+                            <div *ngIf="selectedCustomer()!.phone"><span class="font-semibold">Tel:</span> {{
+                                selectedCustomer()!.phone }}</div>
+                            <div *ngIf="selectedCustomer()!.email"><span class="font-semibold">Email:</span> {{
+                                selectedCustomer()!.email }}</div>
+                        </div>
+                        <small *ngIf="(submitted() || f['customerId'].touched) && f['customerId'].errors?.['required']"
+                            class="text-red-500">Cliente es requerido.</small>
+                    </div>
+
+                    <div class="col-12 md:col-6">
+                        <label class="block mb-2 font-semibold">Vendedor *</label>
+                        <p-select formControlName="sellerId" [options]="sellers()" optionLabel="name" optionValue="id"
+                            placeholder="Seleccione vendedor" [filter]="true" filterBy="name" styleClass="w-full"
+                            [class.ng-invalid]="(submitted() || f['sellerId'].touched) && f['sellerId'].errors"
+                            [class.ng-dirty]="(submitted() || f['sellerId'].touched) && f['sellerId'].errors">
+                        </p-select>
+                        <small *ngIf="(submitted() || f['sellerId'].touched) && f['sellerId'].errors?.['required']"
+                            class="text-red-500">Vendedor es requerido.</small>
+                    </div>
+
+                    <div class="col-12 md:col-6">
+                        <label class="block mb-2 font-semibold">Fecha de Emisión *</label>
+                        <p-datepicker formControlName="issueDate" dateFormat="dd/mm/yy" [showIcon]="true"
+                            styleClass="w-full"></p-datepicker>
+                    </div>
+
+                    <div class="col-12 md:col-6">
+                        <label class="block mb-2 font-semibold">Notas</label>
+                        <textarea pTextarea formControlName="notes" rows="2" class="w-full"
+                            placeholder="Observaciones adicionales..."></textarea>
+                    </div>
+                </div>
+            </p-card>
+
+            <p-card header="Detalle de Productos" styleClass="mb-4">
+                <div class="grid mb-3 align-items-end" [formGroup]="detailForm">
+                    <div class="col-12 md:col-5">
+                        <label class="block mb-2 font-semibold">Producto</label>
+                        <p-select formControlName="product" [options]="products()" optionLabel="name"
+                            placeholder="Buscar producto..." [filter]="true" filterBy="code,name" styleClass="w-full">
+                            <ng-template pTemplate="selectedItem" let-product>
+                                <span *ngIf="product">{{ product.code }} - {{ product.name }}</span>
+                            </ng-template>
+                            <ng-template pTemplate="item" let-product>
+                                <div class="flex justify-content-between align-items-center w-full">
+                                    <span>{{ product.code }} - {{ product.name }}</span>
+                                    <span class="text-primary font-semibold">{{ product.unitPrice | currency }}</span>
+                                </div>
+                            </ng-template>
+                        </p-select>
+                    </div>
+                    <div class="col-6 md:col-2">
+                        <label class="block mb-2 font-semibold">Cantidad</label>
+                        <p-inputNumber formControlName="quantity" [min]="1" [showButtons]="true"
+                            (onFocus)="selectOnFocus($event)" inputStyleClass="w-full"></p-inputNumber>
+                    </div>
+                    <div class="col-6 md:col-2">
+                        <label class="block mb-2 font-semibold">Descuento</label>
+                        <p-inputNumber formControlName="discount" [min]="0" mode="currency" currency="USD"
+                            (onFocus)="selectOnFocus($event)" inputStyleClass="w-full"></p-inputNumber>
+                    </div>
+                    <div class="col-12 md:col-3 flex align-items-end">
+                        <p-button label="Agregar" icon="pi pi-plus" (onClick)="addDetail()"
+                            styleClass="w-full"></p-button>
+                    </div>
+                </div>
+
+                <p-table [value]="details()" styleClass="p-datatable-sm">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>Producto</th>
+                            <th class="text-center">Cantidad</th>
+                            <th class="text-right">P. Unitario</th>
+                            <th class="text-right">Descuento</th>
+                            <th class="text-right">Total Línea</th>
+                            <th class="text-center" style="width: 60px;"></th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-detail let-i="rowIndex">
+                        <tr>
+                            <td>{{ detail.productName }}</td>
+                            <td class="text-center">{{ detail.quantity }}</td>
+                            <td class="text-right">{{ detail.unitPrice | currency }}</td>
+                            <td class="text-right">{{ detail.discount | currency }}</td>
+                            <td class="text-right font-semibold">{{ detail.lineTotal | currency }}</td>
+                            <td class="text-center">
+                                <p-button icon="pi pi-trash" [text]="true" severity="danger" (onClick)="removeDetail(i)"
+                                    pTooltip="Eliminar" tooltipPosition="top"></p-button>
+                            </td>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="emptymessage">
+                        <tr>
+                            <td colspan="6" class="text-center p-3 text-500">No hay productos agregados.</td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </p-card>
+        </div>
+
+        <div class="col-12 lg:col-4">
+            <p-card header="Resumen" styleClass="mb-4">
+                <div class="flex justify-content-between mb-2">
+                    <span>Subtotal</span>
+                    <span class="font-semibold">{{ subtotal() | currency }}</span>
+                </div>
+                <div class="flex justify-content-between mb-2">
+                    <span>IVA ({{ taxRate }}%)</span>
+                    <span class="font-semibold">{{ taxAmount() | currency }}</span>
+                </div>
+                <p-divider></p-divider>
+                <div class="flex justify-content-between mb-2">
+                    <span class="text-xl font-bold">TOTAL</span>
+                    <span class="text-xl font-bold text-primary">{{ total() | currency }}</span>
+                </div>
+                <p-divider></p-divider>
+                <div class="flex justify-content-between mb-2">
+                    <span>Total Pagos</span>
+                    <span class="font-semibold text-green-500">{{ totalPayments() | currency }}</span>
+                </div>
+                <div class="flex justify-content-between">
+                    <span>Pendiente</span>
+                    <span class="font-semibold" [class.text-red-500]="pendingAmount() > 0">
+                        {{ pendingAmount() | currency }}
+                    </span>
+                </div>
+            </p-card>
+
+            <p-card header="Pagos">
+                <div class="flex flex-column gap-3 mb-3" [formGroup]="paymentForm">
+                    <div>
+                        <label class="block mb-2 font-semibold">Método de Pago</label>
+                        <p-select formControlName="paymentMethod" [options]="paymentMethods" optionLabel="label"
+                            optionValue="value" styleClass="w-full"></p-select>
+                    </div>
+                    <div>
+                        <label class="block mb-2 font-semibold">Monto</label>
+                        <p-inputNumber formControlName="amount" mode="currency" currency="USD" [min]="0"
+                            (onFocus)="selectOnFocus($event)" styleClass="w-full" class="w-full"
+                            inputStyleClass="w-full"></p-inputNumber>
+                    </div>
+                    <div *ngIf="pf['paymentMethod'].value === 2">
+                        <label class="block mb-2 font-semibold">Diferido (Meses)</label>
+                        <p-inputNumber formControlName="installments" mode="decimal" [min]="0" [max]="60"
+                            [maxlength]="2" [showButtons]="true" suffix=" Meses" (onFocus)="selectOnFocus($event)"
+                            styleClass="w-full" inputStyleClass="w-full" placeholder="0 = Corriente"></p-inputNumber>
+                        <small class="text-500 block mt-1">0 o 1 = Corriente / Rotativo. Máx. 60 meses.</small>
+                    </div>
+                    <div>
+                        <label class="block mb-2 font-semibold">Referencia</label>
+                        <input pInputText formControlName="reference" [placeholder]="referencePlaceholder"
+                            class="w-full" />
+                    </div>
+                    <p-button label="Agregar Pago" icon="pi pi-plus" (onClick)="addPayment()" [outlined]="true"
+                        styleClass="w-full"></p-button>
+                </div>
+
+                <div *ngFor="let payment of payments(); let i = index"
+                    class="flex justify-content-between align-items-center p-2 border-round surface-100 mb-2">
+                    <div>
+                        <span class="font-semibold">{{ getPaymentMethodLabel(payment.paymentMethod) }}</span>
+                        <br>
+                        <small class="text-500">{{ payment.reference || 'Sin referencia' }}</small>
+                    </div>
+                    <div class="flex align-items-center gap-2">
+                        <span class="text-green-500 font-semibold">{{ payment.amount | currency }}</span>
+                        <p-button icon="pi pi-times" [text]="true" severity="danger" [rounded]="true"
+                            (onClick)="removePayment(i)"></p-button>
+                    </div>
+                </div>
+                <div *ngIf="payments().length === 0" class="text-center text-500 p-3">
+                    Sin pagos registrados.
+                </div>
+            </p-card>
+        </div>
+    </div>
+
+    <div class="flex justify-content-end gap-2 mt-4">
+        <p-button label="Cancelar" severity="secondary" [text]="true" (onClick)="cancel()"></p-button>
+        <p-button label="Guardar Factura" icon="pi pi-save" type="submit" [loading]="loading()"></p-button>
+    </div>
+</form>

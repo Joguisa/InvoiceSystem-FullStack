@@ -28,8 +28,6 @@ public class MappingProfile : Profile
 
         // Invoice
         CreateMap<Invoice, InvoiceDto>()
-            .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.Customer.Name))
-            .ForMember(dest => dest.CustomerIdentification, opt => opt.MapFrom(src => src.Customer.Identification))
             .ForMember(dest => dest.SellerName, opt => opt.MapFrom(src => src.Seller.Name))
             .ForMember(dest => dest.TotalPaid, opt => opt.MapFrom(src => 
                 src.Payments.Where(p => !p.IsVoided).Sum(p => p.Amount)));

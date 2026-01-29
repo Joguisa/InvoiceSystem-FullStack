@@ -22,7 +22,7 @@ public class InvoiceService : IInvoiceService
 
     public async Task<Result<PagedResult<InvoiceDto>>> GetAllAsync(InvoiceFilterRequest filter, CancellationToken cancellationToken = default)
     {
-        var invoices = await _unitOfWork.Invoices.FindAsync(i => i.IsActive, cancellationToken);
+        var invoices = await _unitOfWork.Invoices.FindWithIncludesAsync(i => i.IsActive, new[] { "Seller", "Customer", "Payments" }, cancellationToken);
         var query = invoices.AsQueryable();
 
         if (!string.IsNullOrEmpty(filter.InvoiceNumber))
@@ -64,7 +64,7 @@ public class InvoiceService : IInvoiceService
 
     public async Task<Result<InvoiceDto>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var invoice = await _unitOfWork.Invoices.GetByIdAsync(id, cancellationToken);
+        var invoice = await _unitOfWork.Invoices.GetByIdWithIncludesAsync(id, new[] { "Details.Product", "Payments", "Seller", "Customer" }, cancellationToken);
         
         if (invoice == null || !invoice.IsActive)
             return Result<InvoiceDto>.Failure("Factura no encontrada");
@@ -107,6 +107,10 @@ public class InvoiceService : IInvoiceService
                 IssueDate = request.IssueDate,
                 CustomerId = request.CustomerId,
                 SellerId = request.SellerId,
+                CustomerName = customer.Name,
+                CustomerIdentification = customer.Identification,
+                CustomerPhone = customer.Phone,
+                CustomerEmail = customer.Email,
                 TaxRate = TAX_RATE,
                 Notes = request.Notes,
                 Status = InvoiceStatus.Draft
@@ -130,6 +134,12 @@ public class InvoiceService : IInvoiceService
                 }
 
                 var lineTotal = (product.UnitPrice * detailRequest.Quantity) - detailRequest.Discount;
+                
+                if (lineTotal < 0)
+                {
+                    await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                    return Result<InvoiceDto>.Failure($"El descuento no puede ser mayor al total para el producto {product.Name}");
+                }
                 
                 var detail = new InvoiceDetail
                 {
@@ -163,6 +173,7 @@ public class InvoiceService : IInvoiceService
                     Reference = paymentRequest.Reference,
                     CardLastFourDigits = paymentRequest.CardLastFourDigits,
                     BankName = paymentRequest.BankName,
+                    Installments = paymentRequest.Installments,
                     PaymentDate = paymentRequest.PaymentDate,
                     Notes = paymentRequest.Notes,
                     CreatedAt = DateTime.UtcNow
@@ -190,13 +201,22 @@ public class InvoiceService : IInvoiceService
 
     public async Task<Result<bool>> CancelAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var invoice = await _unitOfWork.Invoices.GetByIdAsync(id, cancellationToken);
+        var invoice = await _unitOfWork.Invoices.GetByIdWithIncludesAsync(id, new[] { "Details", "Details.Product" }, cancellationToken);
         
         if (invoice == null || !invoice.IsActive)
             return Result<bool>.Failure("Factura no encontrada");
 
         if (invoice.Status == InvoiceStatus.Cancelled)
             return Result<bool>.Failure("La factura ya está cancelada");
+
+        foreach (var detail in invoice.Details)
+        {
+            if (detail.Product != null)
+            {
+                detail.Product.Stock += detail.Quantity;
+                _unitOfWork.Products.Update(detail.Product);
+            }
+        }
 
         invoice.Status = InvoiceStatus.Cancelled;
         _unitOfWork.Invoices.Update(invoice);
@@ -207,7 +227,7 @@ public class InvoiceService : IInvoiceService
 
     public async Task<Result<InvoicePaymentDto>> AddPaymentAsync(Guid invoiceId, CreateInvoicePaymentRequest request, CancellationToken cancellationToken = default)
     {
-        var invoice = await _unitOfWork.Invoices.GetByIdAsync(invoiceId, cancellationToken);
+        var invoice = await _unitOfWork.Invoices.GetByIdWithIncludesAsync(invoiceId, new[] { "Payments" }, cancellationToken);
         
         if (invoice == null || !invoice.IsActive)
             return Result<InvoicePaymentDto>.Failure("Factura no encontrada");
@@ -226,6 +246,7 @@ public class InvoiceService : IInvoiceService
             Reference = request.Reference,
             CardLastFourDigits = request.CardLastFourDigits,
             BankName = request.BankName,
+            Installments = request.Installments,
             PaymentDate = request.PaymentDate,
             Notes = request.Notes,
             CreatedAt = DateTime.UtcNow

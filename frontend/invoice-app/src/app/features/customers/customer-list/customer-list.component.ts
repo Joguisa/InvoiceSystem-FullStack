@@ -50,7 +50,6 @@ export class CustomerListComponent implements OnInit {
     this.loading.set(true);
     this.customerService.getAll().subscribe({
       next: (result) => {
-        console.log('[CustomerList] API Response:', result);
         this.data.set(result.items);
         this.totalRecords.set(result.totalCount);
         this.loading.set(false);
@@ -61,12 +60,6 @@ export class CustomerListComponent implements OnInit {
       }
     });
   }
-
-  onLazyLoad(event: any) {
-    // Client-side pagination handled by p-table
-    console.log('Lazy Load event:', event);
-  }
-
 
   openNew() {
     this.selectedCustomer.set(null);
