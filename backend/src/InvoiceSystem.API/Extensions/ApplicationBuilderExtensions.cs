@@ -14,11 +14,11 @@ public static class ApplicationBuilderExtensions
         app.UseMiddleware<ExceptionHandlingMiddleware>();
 
         // Swagger
-        if (app.Environment.IsDevelopment())
-        {
+        //if (app.Environment.IsDevelopment())
+        //{
             app.UseSwagger();
             app.UseSwaggerUI();
-        }
+        //}
 
         app.UseHttpsRedirection();
         app.UseCors("AllowAngular");
