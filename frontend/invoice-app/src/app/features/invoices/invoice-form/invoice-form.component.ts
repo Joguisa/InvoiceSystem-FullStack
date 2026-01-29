@@ -14,6 +14,7 @@ import { TextareaModule } from 'primeng/textarea';
 import { DividerModule } from 'primeng/divider';
 import { TooltipModule } from 'primeng/tooltip';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
+import { InputMaskDirective } from '../../../shared/directives/input-mask.directive';
 import { InvoiceService } from '../../../core/services/invoice.service';
 import { CustomerService } from '../../../core/services/customer.service';
 import { SellerService } from '../../../core/services/seller.service';
@@ -38,7 +39,7 @@ interface InvoiceDetailRow {
   imports: [
     CommonModule, ReactiveFormsModule, ButtonModule, DatePickerModule, CardModule,
     SelectModule, InputTextModule, InputNumberModule, TableModule, TextareaModule,
-    DividerModule, TooltipModule, PageHeaderComponent
+    DividerModule, TooltipModule, PageHeaderComponent, InputMaskDirective
   ],
   templateUrl: './invoice-form.component.html',
   styleUrls: ['./invoice-form.component.scss']

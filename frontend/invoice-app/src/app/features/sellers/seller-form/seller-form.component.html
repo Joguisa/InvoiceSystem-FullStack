@@ -20,8 +20,11 @@
         <small *ngIf="(submitted() || f['name'].touched) && f['name'].errors?.['required']" class="text-red-500">
             Nombre es requerido.
         </small>
-        <small *ngIf="(submitted() || f['name'].touched) && f['name'].errors?.['minlength']" class="text-red-500">
+        <small *ngIf="(submitted() || f['name'].touched) && f['name'].errors?.['minlength']" class="text-red-500 block">
             Nombre debe tener al menos 2 caracteres.
+        </small>
+        <small *ngIf="(submitted() || f['name'].touched) && f['name'].errors?.['maxlength']" class="text-red-500 block">
+            Nombre no puede exceder 100 caracteres.
         </small>
     </div>
 
@@ -30,7 +33,7 @@
         <input pInputText id="email" formControlName="email" type="email"
             [class.ng-invalid]="(submitted() || f['email'].touched) && f['email'].errors"
             [class.ng-dirty]="(submitted() || f['email'].touched) && f['email'].errors" />
-        <small *ngIf="(submitted() || f['email'].touched) && f['email'].errors?.['email']" class="text-red-500">
+        <small *ngIf="(submitted() || f['email'].touched) && f['email'].errors?.['email']" class="text-red-500 block">
             Ingrese un correo válido.
         </small>
     </div>

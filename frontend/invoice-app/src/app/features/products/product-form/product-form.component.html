@@ -23,6 +23,9 @@
         <small *ngIf="(submitted() || f['name'].touched) && f['name'].errors?.['minlength']" class="text-red-500">
             Nombre debe tener al menos 2 caracteres.
         </small>
+        <small *ngIf="(submitted() || f['name'].touched) && f['name'].errors?.['maxlength']" class="text-red-500">
+            Nombre no puede exceder 100 caracteres.
+        </small>
     </div>
 
     <div class="flex flex-column gap-2">

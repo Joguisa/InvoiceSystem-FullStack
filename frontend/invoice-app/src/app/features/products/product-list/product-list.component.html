@@ -8,6 +8,7 @@
 
 <p-dialog header="{{ selectedProduct() ? 'Editar Producto' : 'Nuevo Producto' }}" [(visible)]="dialogVisible"
     [modal]="true" [style]="{width: '600px'}" [closable]="true">
-    <app-product-form [product]="selectedProduct()" (onSave)="onFormSaved()" (onCancel)="dialogVisible.set(false)">
+    <app-product-form *ngIf="dialogVisible()" [product]="selectedProduct()" (onSave)="onFormSaved()"
+        (onCancel)="dialogVisible.set(false)">
     </app-product-form>
 </p-dialog>

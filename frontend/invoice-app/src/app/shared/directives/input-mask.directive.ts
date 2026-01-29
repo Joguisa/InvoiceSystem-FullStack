@@ -12,6 +12,10 @@ export class InputMaskDirective {
 
     @HostListener('input', ['$event'])
     onInput(event: Event): void {
+        if (!event.isTrusted) {
+            return;
+        }
+
         const input = this.el.nativeElement;
         let value = input.value;
 
@@ -53,17 +57,9 @@ export class InputMaskDirective {
         const input = this.el.nativeElement;
         let value = input.value;
 
-        if (this.appInputMask === 'decimal') {
+        if (this.appInputMask === 'decimal' && value.length > 0) {
             const num = parseFloat(value);
             const formatted = !isNaN(num) ? num.toFixed(2) : '0.00';
-
-            if (input.value !== formatted) {
-                input.value = formatted;
-                input.dispatchEvent(new Event('input', { bubbles: true }));
-            }
-        } else if (this.appInputMask === 'numeric') {
-            const num = parseInt(value, 10);
-            const formatted = !isNaN(num) ? num.toString() : '0';
 
             if (input.value !== formatted) {
                 input.value = formatted;

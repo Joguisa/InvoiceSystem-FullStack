@@ -64,7 +64,6 @@ export class InvoiceListComponent implements OnInit {
 
   statusOptions: SelectOption[] = [
     { label: 'Todos', value: null },
-    { label: InvoiceStatusLabels[InvoiceStatus.Draft], value: InvoiceStatus.Draft },
     { label: InvoiceStatusLabels[InvoiceStatus.Issued], value: InvoiceStatus.Issued },
     { label: InvoiceStatusLabels[InvoiceStatus.PartiallyPaid], value: InvoiceStatus.PartiallyPaid },
     { label: InvoiceStatusLabels[InvoiceStatus.Paid], value: InvoiceStatus.Paid },

@@ -52,8 +52,9 @@
 
                     <div class="col-12 md:col-6">
                         <label class="block mb-2 font-semibold">Notas</label>
-                        <textarea pTextarea formControlName="notes" rows="2" class="w-full"
+                        <textarea pTextarea formControlName="notes" rows="2" class="w-full" [maxLength]="500"
                             placeholder="Observaciones adicionales..."></textarea>
+                        <small class="text-500 block text-right">{{ f['notes'].value?.length || 0 }}/500</small>
                     </div>
                 </div>
             </p-card>
@@ -77,12 +78,12 @@
                     </div>
                     <div class="col-6 md:col-2">
                         <label class="block mb-2 font-semibold">Cantidad</label>
-                        <p-inputNumber formControlName="quantity" [min]="1" [showButtons]="true"
-                            (onFocus)="selectOnFocus($event)" inputStyleClass="w-full"></p-inputNumber>
+                        <input pInputText formControlName="quantity" appInputMask="numeric" [maxLength]="6"
+                            (focus)="selectOnFocus($event)" class="w-full" />
                     </div>
                     <div class="col-6 md:col-2">
                         <label class="block mb-2 font-semibold">Descuento</label>
-                        <p-inputNumber formControlName="discount" [min]="0" mode="currency" currency="USD"
+                        <p-inputNumber formControlName="discount" mode="currency" currency="USD" [min]="0"
                             (onFocus)="selectOnFocus($event)" inputStyleClass="w-full"></p-inputNumber>
                     </div>
                     <div class="col-12 md:col-3 flex align-items-end">
@@ -175,7 +176,7 @@
                     <div>
                         <label class="block mb-2 font-semibold">Referencia</label>
                         <input pInputText formControlName="reference" [placeholder]="referencePlaceholder"
-                            class="w-full" />
+                            class="w-full" [maxLength]="50" />
                     </div>
                     <p-button label="Agregar Pago" icon="pi pi-plus" (onClick)="addPayment()" [outlined]="true"
                         styleClass="w-full"></p-button>

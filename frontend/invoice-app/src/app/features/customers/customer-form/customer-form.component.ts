@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
-import { DropdownModule } from 'primeng/dropdown';
+import { SelectModule } from 'primeng/select';
 import { ButtonModule } from 'primeng/button';
 import { MessageService } from 'primeng/api';
 import { Customer, CreateCustomerRequest, IdentificationType, IdentificationTypeLabels } from '../../../core/models';
@@ -12,7 +12,7 @@ import { InputMaskDirective } from '../../../shared/directives/input-mask.direct
 @Component({
   selector: 'app-customer-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, InputTextModule, DropdownModule, ButtonModule, InputMaskDirective],
+  imports: [CommonModule, ReactiveFormsModule, InputTextModule, SelectModule, ButtonModule, InputMaskDirective],
   templateUrl: './customer-form.component.html',
   styleUrls: ['./customer-form.component.scss']
 })
@@ -48,61 +48,79 @@ export class CustomerFormComponent implements OnChanges, OnInit {
   get f() { return this.form.controls; }
 
   ngOnInit() {
-    // Subscribe to identificationType changes
     this.form.get('identificationType')?.valueChanges.subscribe(type => {
+      if (typeof type === 'string') {
+        const numType = Number(type);
+        if (!isNaN(numType)) {
+          this.form.get('identificationType')?.setValue(numType, { emitEvent: false });
+        }
+      }
       this.updateIdentificationValidators(type);
     });
-    // Set initial validators
-    this.updateIdentificationValidators(IdentificationType.Cedula);
+    const currentType = this.form.get('identificationType')?.value;
+    this.updateIdentificationValidators(currentType);
   }
 
-  updateIdentificationValidators(type: IdentificationType) {
+  updateIdentificationValidators(type: IdentificationType | number | string) {
     const identificationControl = this.form.get('identification');
     if (!identificationControl) return;
 
+    const typeValue = Number(type);
     let validators = [Validators.required];
 
-    switch (type) {
+    switch (typeValue) {
       case IdentificationType.Cedula:
-        // Cédula: exactly 10 digits
         validators.push(Validators.pattern(/^[0-9]{10}$/));
         break;
       case IdentificationType.RUC:
-        // RUC: exactly 13 digits
         validators.push(Validators.pattern(/^[0-9]{13}$/));
         break;
       case IdentificationType.Pasaporte:
-        // Pasaporte: alphanumeric, 5-20 characters
         validators.push(Validators.pattern(/^[A-Za-z0-9]{5,20}$/));
         break;
     }
 
     identificationControl.setValidators(validators);
-    identificationControl.updateValueAndValidity();
+    identificationControl.updateValueAndValidity({ emitEvent: false });
   }
 
   getIdentificationError(): string {
-    const type = this.form.get('identificationType')?.value;
     const ctrl = this.f['identification'];
+    if (!ctrl.errors) return '';
 
-    if (ctrl.errors?.['required']) return 'Identificación es requerida.';
-    if (ctrl.errors?.['pattern']) {
+    const type = Number(this.form.get('identificationType')?.value);
+
+    if (ctrl.errors['required']) return 'Identificación es requerida.';
+    if (ctrl.errors['pattern']) {
       switch (type) {
         case IdentificationType.Cedula: return 'Cédula debe tener exactamente 10 dígitos.';
         case IdentificationType.RUC: return 'RUC debe tener exactamente 13 dígitos.';
         case IdentificationType.Pasaporte: return 'Pasaporte debe tener entre 5-20 caracteres alfanuméricos.';
       }
     }
-    return '';
+    return 'Identificación inválida.';
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['customer'] && this.customer) {
-      this.form.patchValue(this.customer);
-      this.updateIdentificationValidators(this.customer.identificationType);
+      const type = Number(this.customer.identificationType);
+
+      const cleanedIdentification = this.customer.identification?.trim() || '';
+
+      this.form.get('identificationType')?.setValue(type, { emitEvent: false });
+      this.updateIdentificationValidators(type);
+      this.form.patchValue({
+        ...this.customer,
+        identificationType: type,
+        identification: cleanedIdentification
+      });
+
+      this.form.markAsPristine();
+      this.form.markAsUntouched();
       this.submitted.set(false);
-    } else {
+    } else if (changes['customer']) {
       this.form.reset({ identificationType: IdentificationType.Cedula });
+      this.updateIdentificationValidators(IdentificationType.Cedula);
       this.submitted.set(false);
     }
   }
