@@ -49,7 +49,10 @@ public static class ServiceCollectionExtensions
         {
             options.AddPolicy("AllowAngular", policy =>
             {
-                policy.WithOrigins("http://localhost:4200")
+                policy.WithOrigins(
+                    "http://localhost:4200", // Tu entorno local
+                    "https://purple-tree-0d5bcc61e.1.azurestaticapps.net"
+                )
                       .AllowAnyHeader()
                       .AllowAnyMethod();
             });
