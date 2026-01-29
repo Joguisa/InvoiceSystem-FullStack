@@ -5,6 +5,11 @@ Sistema de gestión de facturas completo (Full Stack) desarrollado como parte de
 ## 📋 Descripción
 Esta solución implementa un sistema para la gestión de facturas, clientes, vendedores y productos. Permite la creación, consulta y administración de documentos de facturación, siguiendo una arquitectura moderna y escalable.
 
+## 🌐 Despliegue en Vivo (Live Demo)
+El proyecto se encuentra desplegado y funcional en Microsoft Azure:
+- **Frontend (App Web)**: [Ver Aplicación](https://purple-tree-0d5bcc61e.1.azurestaticapps.net)
+- **Backend (Swagger UI)**: [Ver Documentación API](https://api-jguillen-aza3g7cxh8d2e4c5.centralus-01.azurewebsites.net/swagger/index.html)
+
 ## 🚀 Tecnologías y Arquitectura
 
 ### Backend
